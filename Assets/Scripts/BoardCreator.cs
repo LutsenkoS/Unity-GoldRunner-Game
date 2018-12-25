@@ -14,8 +14,6 @@ public class BoardCreator : MonoBehaviour {
     public GameObject wall;
     public int width;
     public int height;
-    //public int minWallCount;
-    //public int maxWallCount;
     [HideInInspector]
     public int[,] path;
     private TileType[][] tiles;
@@ -32,9 +30,6 @@ public class BoardCreator : MonoBehaviour {
         InstantiateOuterWall();
         path = new int[width + 2, height + 2];
         path = GeneratePath();
-        //if (Time.timeScale == 0)
-        //    Time.timeScale = 1;
-        //GameManager.Instance.score = 0;
     }
 
     private void InstantiateOuterWall()
@@ -115,7 +110,6 @@ public class BoardCreator : MonoBehaviour {
         while(YCoord <= height + 1)
         {
             int blockLength = (int)UnityEngine.Random.Range(1.0f, width / 4);
-            //int startPos = UnityEngine.Random.Range(0, 2);
             for (int i = 0; i < blockLength; i++)
             {
                 if (YCoord == height + 2)
@@ -126,24 +120,6 @@ public class BoardCreator : MonoBehaviour {
             YCoord++;
         }
     }
-
-    //private void RandomPosition(int row)
-    //{
-    //    int wallCount = UnityEngine.Random.Range(minWallCount, maxWallCount);
-    //    int[] positions = new int[wallCount];
-    //    //int pos = UnityEngine.Random.Range(1, width);
-    //    System.Random r = new System.Random(unchecked((int)DateTime.Now.Ticks));
-
-    //    for (int i = 0; i < positions.Length; i++)
-    //    {
-    //        positions[i] = r.Next(width);
-    //        //Debug.Log(positions[i].ToString() + " " + row.ToString());
-    //    }
-    //    foreach (int position in positions)
-    //    {
-    //        tiles[position][row] = TileType.Wall;
-    //    }
-    //}
 
     private void CreateFloor()
     {

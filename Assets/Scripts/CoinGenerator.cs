@@ -18,7 +18,7 @@ public class CoinGenerator : MonoBehaviour {
 
     void Start()
     {
-        board = GameObject.Find("GameManager").GetComponent<BoardCreator>();
+        board = GameObject.Find("BoardHolder").GetComponent<BoardCreator>();
         width = board.width;
         height = board.height;
         lastInterval = Time.realtimeSinceStartup;
@@ -43,7 +43,7 @@ public class CoinGenerator : MonoBehaviour {
         if (coins < maxCoins)
         {
             float x = UnityEngine.Random.Range(1, width);
-            x = (x == 1) ? 1 : ((x % 2) == 1) ? x : x - 1;
+            x = ((x % 2) == 1) ? x : x - 1;
             float y = UnityEngine.Random.Range(1, height);
             Vector3 position = new Vector3(x, y, 0.0f);            
 

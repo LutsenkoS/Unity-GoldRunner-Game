@@ -11,9 +11,6 @@ public class EnemyHelper : MonoBehaviour {
 
     public float speed;
     public float delta;
-    //public GameObject wall;
-
-    private bool attack;
 
     public bool InAttack
     {
@@ -24,7 +21,7 @@ public class EnemyHelper : MonoBehaviour {
             if (value == true) animator.SetBool("IsAttack", true);
         }
     }
-
+    bool attack;
     GameObject player;
     Animator animator;
     Rigidbody2D rb2D;
@@ -107,68 +104,6 @@ public class EnemyHelper : MonoBehaviour {
         return directions;
     }
 
-    //private void Move(Direction dir)
-    //{
-    //    //bool top, right, bottom, left;
-    //    //float xPos;
-    //    //float yPos;
-    //    //int x = Convert.ToInt32(transform.position.x);
-    //    //int y = Convert.ToInt32(transform.position.y);
-    //    //Direction direction;
-    //    Vector3 movement = new Vector3();
-    //    switch(dir)
-    //    {
-    //        case Direction.Top:
-    //            {
-    //                movement.Set(0.0f, 1.0f, 0.0f);
-    //                break;
-    //            }
-    //        case Direction.Left:
-    //            {
-    //                movement.Set(-1.0f, 0.0f, 0.0f);
-    //                break;
-    //            }
-    //        case Direction.Right:
-    //            {
-    //                movement.Set(1.0f, 0.0f, 0.0f);
-    //                break;
-    //            }
-    //        case Direction.Bottom:
-    //            {
-    //                movement.Set(0.0f, -1.0f, 0.0f);
-    //                break;
-    //            }
-    //    }
-    //    //while ((transform.position.x - x) > 0.1 && (transform.position.y - y) > 0.1)
-    //    //{            
-    //    //    if (y < board.height - 1)
-    //    //        if (path[x, y + 1] == 0)
-    //    //        {
-    //    //            movement.Set(0.0f, 1.0f, 0.0f);
-    //    //        }
-    //    //    if (x > 0)
-    //    //        if (path[x - 1, y] == 0)
-    //    //        {
-    //    //            movement.Set(-1.0f, 0.0f, 0.0f);
-    //    //        }
-    //    //    if (x < board.width - 1)
-    //    //        if (path[x + 1, y] == 0)
-    //    //        {
-    //    //            movement.Set(1.0f, 0.0f, 0.0f);
-    //    //        }
-    //    //    if (y > 0)
-    //    //        if (path[x, y - 1] == 0)
-    //    //        {
-    //    //            movement.Set(0.0f, -1.0f, 0.0f);
-    //    //        }
-    //    //}
-        
-            
-    //    movement = movement * speed * Time.deltaTime;
-    //    transform.position += movement;
-
-        
-    //}
     private void Move(Direction dir)
     {       
         Vector2 movement = new Vector2();
@@ -200,28 +135,19 @@ public class EnemyHelper : MonoBehaviour {
 
 
         rb2D.MovePosition(rb2D.position + movement * speed * Time.fixedDeltaTime);
-        //movement = movement * speed * Time.deltaTime;
         
 
 
     }
     void OnCollisionEnter2D(Collision2D other)
     {
-        //if (other.gameObject.CompareTag("Player"))
-        //{
-        //    Debug.Log("Game over");            
-        //    GameManager.Instance.GameOver = true;
-        //}
+        
         if (other.gameObject.CompareTag("Wall"))
         {
-            //Debug.Log("Touched the wall" + transform.position.x.ToString() + " " + transform.position.y.ToString());
             List<Direction> dirs = new List<Direction>();
             dirs.AddRange(CheckDirection(true));
             ChangeDirection(dirs);
-            
-            
-            
-            //Move(direction);
+                   
         }
         if (other.gameObject.CompareTag("Zombie") || other.gameObject.CompareTag("Mummy"))
         {
@@ -230,13 +156,6 @@ public class EnemyHelper : MonoBehaviour {
         if (other.gameObject.CompareTag("Player"))
         {
             StartCoroutine(Attack());
-            //Attack();
-            
-            
-            
-            //Destroy(gameObject); 
-
-            //GameOverText.gameObject.SetActive(true);
         }
     }
 
@@ -260,18 +179,11 @@ public class EnemyHelper : MonoBehaviour {
 
     private void ChangeDirection(List<Direction> directions)
     {
-        //Debug.Log(direction);
         Direction currentDirection = direction;
         if (directions.Count > 1)
         {
             directions.Remove(ReverseDirection(currentDirection));
         }
-        //Debug.Log("Change direction" + directions.Count.ToString());
-        //foreach (var dir in directions)
-        //{
-        //    Debug.Log(dir);
-        //}
-
         
         direction = directions[new System.Random().Next(0, directions.Count)];
         //return to full number coordinates

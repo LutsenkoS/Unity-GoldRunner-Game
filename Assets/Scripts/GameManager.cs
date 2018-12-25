@@ -4,21 +4,24 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System.Xml;
 
-public class GameManager : MonoBehaviour {
+public class GameManager : MonoBehaviour
+{
 
     public GameObject player;
     public GameObject zombie;
     public GameObject mummy;
     public GameObject gameOverText;
+    public GameObject hintToMainMenu;
     public int score;
-    
+
 
     public string PlayerName
     {
         get { return playerName; }
         set
-        {            
+        {
             playerName = value;
             playerNameText = GameObject.Find("PlayerName").GetComponent<Text>();
             playerNameText.text = "Current player: " + value;
@@ -32,12 +35,11 @@ public class GameManager : MonoBehaviour {
         {
             gameOver = value;
             OnGameOver(value);
-            
+
         }
     }
-    
 
-    //private GameOverHelper GameOverText;
+
     BoardCreator board;
     int[,] path;
     public static GameManager Instance
@@ -50,8 +52,7 @@ public class GameManager : MonoBehaviour {
     private static GameManager instance = null;
     private string playerName;
 
-    //private bool isZombie = false;
-    private int zombieCount;    
+    private int zombieCount;
     private bool isMummy = false;
     private bool gameOver;
 
@@ -60,8 +61,6 @@ public class GameManager : MonoBehaviour {
     private EnemyHelper zombie2;
     private GameObject[] zombies;
     private EnemyHelper mummyEnemy;
-    //private int scoreLimit = 0;
-    //private int zombieLimit = 1;
 
     void Awake()
     {
@@ -71,16 +70,10 @@ public class GameManager : MonoBehaviour {
             return;
         }
         instance = this;
-        //DontDestroyOnLoad(gameObject);
-
-        //GameOverText = FindObjectOfType<GameOverHelper>();
-
-        //score = GetComponent<Text>();
     }
     void Start()
-    {      
-        
-        //Instantiate(player, new Vector3(1.0f, 1.0f, 0.0f), Quaternion.identity);
+    {
+
         InstantiateEnemy(zombie);
         zombieCount = 1;
         Time.timeScale = 1;
@@ -89,7 +82,7 @@ public class GameManager : MonoBehaviour {
 
     private void InstantiateEnemy(GameObject enemy)
     {
-        board = GetComponent<BoardCreator>();       
+        board = GameObject.Find("BoardHolder").GetComponent<BoardCreator>();
         int startX = ((board.width % 2) == 0) ? (board.width - 1) : (board.width - 0);
         int startY = board.height / 3;
         Vector3 startPosition = new Vector3(startX, startY, 0.0f);
@@ -98,62 +91,92 @@ public class GameManager : MonoBehaviour {
 
     void Update()
     {
-        if(Input.GetKey("escape"))
+        if (Input.GetKey("escape"))
         {
-            
-            SceneManager.LoadScene(0);   
+            if (!GameOver)
+                SaveScoreToXml();
+            SceneManager.LoadScene(0);
+
         }
-        //score.text = "Coins: " + player.TakedCoins.ToString();
         CheckScore();
-        
+
     }
-    //private void OnGameOver()
-    //{
-    //    Time.timeScale = 0;
-    //    GameOverText.gameObject.SetActive(true);
-    //}
+
     private void OnGameOver(bool value)
     {
         if (value)
         {
-
             Time.timeScale = 0;
             gameOverText.SetActive(true);
+            hintToMainMenu.SetActive(true);
+
+            SaveScoreToXml();
         }
     }
+
+    private void SaveScoreToXml()
+    {
+        Settings.pickedCoins = score;
+        Settings.playTime = (float)Math.Round(Time.timeSinceLevelLoad, 2);
+
+        XmlDocument xmlDoc = new XmlDocument();
+        XmlNode rootNode;
+        try
+        {
+            xmlDoc.Load("Score.xml");
+            rootNode = xmlDoc.ChildNodes[0];
+        }
+        catch (Exception ex)
+        {
+            Debug.Log(ex.Message);
+            rootNode = xmlDoc.CreateElement("Score");
+            xmlDoc.AppendChild(rootNode);
+
+
+        }
+
+        XmlNode userNode;
+
+        userNode = xmlDoc.CreateElement("PlayerName");
+        userNode.InnerText = Settings.playerName;
+        rootNode.AppendChild(userNode);
+        //Debug.Log(Settings.playerName);
+        userNode = xmlDoc.CreateElement("PickedCoins");
+        userNode.InnerText = Settings.pickedCoins.ToString();
+        rootNode.AppendChild(userNode);
+        userNode = xmlDoc.CreateElement("PlayTime");
+        userNode.InnerText = Settings.playTime.ToString();
+        rootNode.AppendChild(userNode);
+
+        xmlDoc.Save("Score.xml");
+    }
+
     private void CheckScore()
     {
-        
-        if (score > 4 && zombieCount < 2) 
+
+        if (score > 4 && zombieCount < 2)
         {
             InstantiateEnemy(zombie);
-            //scoreLimit += 5;
             zombieCount++;
-            //if(zombieLimit < 2)
-            //    zombieLimit += 1;
             zombies = GameObject.FindGameObjectsWithTag("Zombie");
             zombie1 = zombies[0].GetComponent<EnemyHelper>();
-            //if(zombieCount > 1)
-                zombie2 = zombies[1].GetComponent<EnemyHelper>();
+            zombie2 = zombies[1].GetComponent<EnemyHelper>();
         }
-        if(score > 9 && !isMummy)
+        if (score > 9 && !isMummy)
         {
             InstantiateEnemy(mummy);
             isMummy = true;
             mummyEnemy = GameObject.FindGameObjectWithTag("Mummy").GetComponent<EnemyHelper>();
         }
-       
+
     }
 
-    
+
 
     public void IncreaseEnemySpeed()
     {
-        //if (zombie1.speed < 2f)
-        //{
-            zombie1.speed += zombie1.speed * 0.05f;
-            zombie2.speed += zombie2.speed * 0.05f;
-        //}
+        zombie1.speed += zombie1.speed * 0.05f;
+        zombie2.speed += zombie2.speed * 0.05f;
         mummyEnemy.speed += mummyEnemy.speed * 0.05f;
     }
 }
